@@ -18,7 +18,13 @@ export default function PortfolioHome() {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null)
   const audioChunksRef = useRef<Blob[]>([])
 
-  // Handles standard text chat
+  // Helper to play base64 audio
+  const playAudio = (base64String: string) => {
+    if (!base64String) return;
+    const audio = new Audio(`data:audio/mp3;base64,${base64String}`);
+    audio.play();
+  };
+
   const handleSendText = async () => {
     if (!input.trim()) return
     const userText = input
@@ -34,6 +40,10 @@ export default function PortfolioHome() {
       })
       const data = await response.json()
       setMessages((prev) => [...prev, { role: "ai", content: data.reply }])
+      
+      if (data.audio_base64) {
+        playAudio(data.audio_base64)
+      }
     } catch (error) {
       setMessages((prev) => [...prev, { role: "ai", content: "Error: Could not reach the backend." }])
     } finally {
@@ -41,15 +51,12 @@ export default function PortfolioHome() {
     }
   }
 
-  // Handles starting/stopping voice recording
   const handleRecordToggle = async () => {
     if (isRecording) {
-      // Stop recording
       mediaRecorderRef.current?.stop()
       setIsRecording(false)
       setIsProcessing(true)
     } else {
-      // Start recording
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
         const mediaRecorder = new MediaRecorder(stream)
@@ -65,7 +72,6 @@ export default function PortfolioHome() {
           const formData = new FormData()
           formData.append("audio", audioBlob, "audio.webm")
 
-          // Send audio file to FastAPI
           try {
             const response = await fetch("http://localhost:8000/api/voice", {
               method: "POST",
@@ -73,16 +79,18 @@ export default function PortfolioHome() {
             })
             const data = await response.json()
             
-            // Add both the transcribed text and the AI reply to the UI
             if (data.user_text) {
               setMessages((prev) => [...prev, { role: "user", content: data.user_text }])
             }
             setMessages((prev) => [...prev, { role: "ai", content: data.reply }])
+            
+            if (data.audio_base64) {
+              playAudio(data.audio_base64)
+            }
           } catch (error) {
             setMessages((prev) => [...prev, { role: "ai", content: "Error processing voice." }])
           } finally {
             setIsProcessing(false)
-            // Release the microphone
             stream.getTracks().forEach(track => track.stop())
           }
         }
@@ -98,13 +106,12 @@ export default function PortfolioHome() {
 
   return (
     <main className="flex min-h-screen flex-col items-center p-8 bg-slate-50 dark:bg-slate-950">
-      
       <div className="max-w-4xl w-full mb-12 text-center mt-12">
         <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl mb-4">
-          Eli Kobia
+          Eli Wahome Kobia
         </h1>
         <p className="text-xl text-muted-foreground">
-          AI Professional & Backend Engineer
+          Software Engineer | Backend & Computational Logic
         </p>
       </div>
 
@@ -114,13 +121,12 @@ export default function PortfolioHome() {
             <Bot className="w-6 h-6" />
             Chat with my Portfolio
           </CardTitle>
-          <CardDescription>Ask my AI assistant about my skills, projects, and background.</CardDescription>
+          <CardDescription>Ask my AI assistant about my Spring Boot, Python, and system logic expertise.</CardDescription>
         </CardHeader>
         
         <CardContent className="p-0">
           <ScrollArea className="h-[400px] p-4">
             <div className="flex flex-col gap-4">
-              
               {messages.map((msg, index) => (
                 <div key={index} className={`flex gap-3 text-sm ${msg.role === "user" ? "flex-row-reverse" : ""}`}>
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${msg.role === "user" ? "bg-slate-200 dark:bg-slate-700" : "bg-blue-100 dark:bg-blue-900"}`}>
@@ -139,7 +145,6 @@ export default function PortfolioHome() {
                   </div>
                 </div>
               )}
-              
             </div>
           </ScrollArea>
 
@@ -168,7 +173,6 @@ export default function PortfolioHome() {
           </div>
         </CardContent>
       </Card>
-
     </main>
   )
 }
