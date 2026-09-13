@@ -88,6 +88,9 @@ export default function PortfolioHome() {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null)
   const audioChunksRef = useRef<Blob[]>([])
 
+  // Dynamic API URL for production and local development
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+
   const playAudio = (base64String: string) => {
     if (!base64String) return;
     const audio = new Audio(`data:audio/mp3;base64,${base64String}`);
@@ -141,7 +144,7 @@ export default function PortfolioHome() {
     setIsProcessing(true)
 
     try {
-      const response = await fetch("http://localhost:8000/api/chat", {
+      const response = await fetch(`${apiUrl}/api/chat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: userText }),
@@ -178,7 +181,7 @@ export default function PortfolioHome() {
           formData.append("audio", audioBlob, "audio.webm")
 
           try {
-            const response = await fetch("http://localhost:8000/api/voice", {
+            const response = await fetch(`${apiUrl}/api/voice`, {
               method: "POST",
               body: formData,
             })
