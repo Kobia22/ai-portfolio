@@ -113,7 +113,7 @@ async def chat_endpoint(req: ChatRequest):
     
     # 1. Get LLM Response from Groq
     completion = client.chat.completions.create(
-        model="llama-3.1-8b-instant", # <-- The new supported model
+        model="openai/gpt-oss-20b", # <-- Authorized and active
         messages=[
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": user_text}
@@ -159,7 +159,7 @@ async def voice_endpoint(audio: UploadFile = File(...)):
 
     # 3. Get LLM Response
     completion = client.chat.completions.create(
-        model="llama-3.1-8b-instant", # <-- The new supported model
+        model="openai/gpt-oss-20b", # <-- Authorized and active
         messages=[
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": user_text}
