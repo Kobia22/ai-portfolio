@@ -150,19 +150,14 @@ export default function PortfolioHome() {
         );
       }
       
-      // Parse bold markdown (**text**)
+      // Parse bold markdown (**text**) without the whitespace quirk
       const boldParts = part.split(/(\*\*.*?\*\*)/g);
-      return (
-        <span key={i}>
-          {boldParts.map((boldPart, j) => {
-            if (boldPart.startsWith('**') && boldPart.endsWith('**')) {
-              // Remove the asterisks and wrap in a bold tag
-              return <strong key={j} className="font-semibold text-slate-900 dark:text-slate-100">{boldPart.slice(2, -2)}</strong>;
-            }
-            return <span key={j}>{boldPart}</span>;
-          })}
-        </span>
-      );
+      return <span key={i}>{boldParts.map((boldPart, j) => {
+        if (boldPart.startsWith('**') && boldPart.endsWith('**')) {
+          return <strong key={j} className="font-semibold text-slate-900 dark:text-slate-100">{boldPart.slice(2, -2)}</strong>;
+        }
+        return <span key={j}>{boldPart}</span>;
+      })}</span>;
     });
   };
 
@@ -297,7 +292,9 @@ export default function PortfolioHome() {
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 shadow-sm ${msg.role === "user" ? "bg-slate-200 dark:bg-slate-800" : "bg-blue-100 dark:bg-blue-900/50"}`}>
                       {msg.role === "user" ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4 text-blue-600 dark:text-blue-400" />}
                     </div>
-                    <div className={`p-3 rounded-lg shadow-sm whitespace-pre-wrap ${msg.role === "user" ? "bg-slate-900 text-slate-50 dark:bg-slate-100 dark:text-slate-900 rounded-tr-none" : "bg-white dark:bg-slate-900 border rounded-tl-none leading-relaxed"}`}>                      {msg.role === "ai" ? renderMessage(msg.content) : msg.content}
+                    {/* Added whitespace-pre-wrap here to respect the AI's line breaks for bullets */}
+                    <div className={`p-3 rounded-lg shadow-sm whitespace-pre-wrap ${msg.role === "user" ? "bg-slate-900 text-slate-50 dark:bg-slate-100 dark:text-slate-900 rounded-tr-none" : "bg-white dark:bg-slate-900 border rounded-tl-none leading-relaxed"}`}>
+                      {msg.role === "ai" ? renderMessage(msg.content) : msg.content}
                     </div>
                   </motion.div>
                 ))}
