@@ -76,7 +76,9 @@ const FibonacciGraphic = () => (
   </div>
 )
 
-function SuggestionChips({ onChipClick }) {  const suggestions = [
+// TypeScript Fix 1: Explicitly defining the prop type here
+function SuggestionChips({ onChipClick }: { onChipClick: (text: string) => void }) {
+  const suggestions = [
     "What is Eli's tech stack?",
     "Show me Eli's CV",
     "Where did Eli go to university?"
@@ -299,7 +301,8 @@ export default function PortfolioHome() {
             </ScrollArea>
             
             <div className="px-4 pt-2">
-              <SuggestionChips onChipClick={(text) => setInput(text)} />
+              {/* TypeScript Fix 2: Explicitly typing the parameter here */}
+              <SuggestionChips onChipClick={(text: string) => setInput(text)} />
             </div>
             
             <div className="p-4 border-t bg-slate-50/50 dark:bg-slate-950/50 flex gap-2">
