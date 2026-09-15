@@ -76,6 +76,27 @@ const FibonacciGraphic = () => (
   </div>
 )
 
+function SuggestionChips({ onChipClick }) {  const suggestions = [
+    "What is Eli's tech stack?",
+    "Show me Eli's CV",
+    "Where did Eli go to university?"
+  ];
+
+  return (
+    <div className="flex flex-wrap gap-2 mb-4">
+      {suggestions.map((text, index) => (
+        <button
+          key={index}
+          onClick={() => onChipClick(text)}
+          className="text-xs px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-full transition-colors border border-slate-200"
+        >
+          {text}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 export default function PortfolioHome() {
   const router = useRouter()
   const [input, setInput] = useState("")
@@ -276,7 +297,11 @@ export default function PortfolioHome() {
                 )}
               </div>
             </ScrollArea>
-
+            
+            <div className="px-4 pt-2">
+              <SuggestionChips onChipClick={(text) => setInput(text)} />
+            </div>
+            
             <div className="p-4 border-t bg-slate-50/50 dark:bg-slate-950/50 flex gap-2">
               <Button 
                 size="icon" 
